@@ -1,0 +1,52 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "sim.de",
+        "description": "Sign in with the account you use on service.sim.de.",
+        "data": {
+          "username": "Username or customer number",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate sim.de",
+        "description": "Your sim.de password is no longer valid.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid username or password.",
+      "cannot_connect": "Failed to reach the sim.de Servicewelt.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This sim.de account is already configured.",
+      "reauth_successful": "Re-authentication was successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "sim.de options",
+        "description": "The Servicewelt refreshes its usage counters only a few times a day, so there is little to gain from polling often.",
+        "data": {
+          "scan_interval": "Update interval (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "data_used": { "name": "Data used" },
+      "data_remaining": { "name": "Data remaining" },
+      "data_allowance": { "name": "Data allowance" },
+      "data_usage": { "name": "Data usage" },
+      "previous_data_used": { "name": "Previous month data used" },
+      "previous_data_usage": { "name": "Previous month data usage" },
+      "plan": { "name": "Plan" }
+    }
+  }
+}

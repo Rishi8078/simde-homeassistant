@@ -1,0 +1,13 @@
+{
+  "domain": "sim_de",
+  "name": "sim.de",
+  "codeowners": ["@Rishi8078"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/Rishi8078/simde-homeassistant",
+  "integration_type": "device",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/Rishi8078/simde-homeassistant/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}
