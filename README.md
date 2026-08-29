@@ -1,6 +1,6 @@
 # sim.de Home Assistant Integration
 
-Track the data allowance of your sim.de (Drillisch Online) SIM from Home Assistant. The integration signs into the Servicewelt the same way your browser does, reads the current and previous billing month, and exposes how much data is left — so you can see the gauge on a dashboard and get told *before* the Datenautomatik buys another 300 MB at 13× the in-plan rate.
+Track the data allowance of your sim.de (Drillisch Online) SIM from Home Assistant. The integration signs into the Servicewelt the same way your browser does, reads the current and previous billing month, and exposes how much data is left — so a dashboard can show the gauge and an automation can warn you before the Datenautomatik buys another 300 MB at 13× the in-plan rate.
 
 [![Home Assistant][ha_badge]][ha_link] [![HACS][hacs_badge]][hacs_link] [![GitHub Release][release_badge]][release]
 
@@ -155,11 +155,11 @@ sim.de publishes no API, so the integration reads the same pages the Servicewelt
 
 Two shapes are parsed out of the HTML. The tariff facts sit in labelled `c-key_value_container` rows (`Tarif`, `Mobilfunknetz`, `Kundennummer`, …). The usage figures sit in two tabs, `#tab-cur` and `#tab-mon`, each reading `15,58 GB von 16,00 GB verbraucht` — with `(davon 3 x 300,00 MB Datenautomatik)` appended once the automatic top-up has bought extra volume.
 
-Three details worth knowing:
+Three quirks of the Servicewelt shape the parsing:
 
 - **The tariff name is only on `showTariffInfo`.** The overview page carries a `digitalData` object that looks promising but ships `"product.eppixTariffName" : ""` — empty. It is used only as a fallback, and only when non-empty.
 - **The allowance moves.** `allowance_gb` is what the Servicewelt currently shows, so a month where the Datenautomatik fired reads 16.88 GB rather than the plan's 16 GB. That is why `data_usage` can exceed 100 %.
-- **The session is a cookie.** The integration creates its own `aiohttp` session rather than sharing Home Assistant's, so its cookie jar stays isolated. If the session expires mid-poll, the Servicewelt answers with the login form instead of an error; that is detected and the login is repeated once, transparently.
+- **The session is a cookie.** The integration creates its own `aiohttp` session rather than sharing Home Assistant's, so its cookie jar stays isolated. If the session expires mid-poll, the Servicewelt answers with the login form instead of an error; that is detected and the login is repeated once.
 
 Everything the integration does is read-only. It never changes a tariff, books an option or spends money.
 
@@ -167,16 +167,17 @@ There are no third-party requirements: the parsing runs on the standard library'
 
 ## Development
 
-```bash
-pip install -r requirements_test.txt
-pytest
+The integration needs no build step and no third-party package. Copy `custom_components/sim_de` into a Home Assistant config directory, restart, and watch `home-assistant.log` — the client logs at debug level under `custom_components.sim_de`.
+
+```yaml
+logger:
+  logs:
+    custom_components.sim_de: debug
 ```
 
-The tests run without a Home Assistant installation: `tests/conftest.py` registers `custom_components/sim_de` as an importable package without executing its `__init__.py`, so `api`, `models` and `const` can be tested on their own. `tests/test_api.py` drives the client against a fake Servicewelt built on `aiohttp.test_utils`, covering the login handshake, an expired session, a changed login page and an unreachable host.
+`models.py` holds all the parsing and touches no network, so it can be exercised on a saved page without Home Assistant running. When the Servicewelt markup changes, that is the file to update: its `HTMLParser` subclasses read the `c-key_value_container` rows and the `#tab-cur` / `#tab-mon` text, and everything downstream works on their output.
 
-Every fixture is invented. No real customer number, phone number or password is in this repository.
-
-When the Servicewelt markup changes, [`tools/sim_usage_client.py`](tools/README.md) captures the live pages so you can diff them against what `models.py` expects.
+Every example value in this README is invented. No real customer number, phone number or password is in this repository.
 
 ## Disclaimer
 

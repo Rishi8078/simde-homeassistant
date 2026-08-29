@@ -4,3 +4,9 @@ __pycache__/
 .pytest_cache/
 sim_output/
 *.local.json
+
+# Development-only, not shipped with the integration
+tests/
+tools/
+pytest.ini
+requirements_test.txt
